@@ -2,23 +2,53 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.io.*;
 
-public class NFA {
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public class NFA implements Serializable{
+    private static final long srVersion = 1L;  //Уникален идентификатор за серилация 
+    public static int idCounter = 0;   //Главен брояч
+
+    private int id; //нова id за всеки нов атрибут
     private Set<String> states;
-    
     private Set<String> alphabet;
-    
     private List<Transition> transitions;
-
     private String startState;
-
     private Set<String> acceptStates;
 
     public NFA() {
+        this.id = ++ idCounter;
         this.states = new HashSet<>();
         this.alphabet = new HashSet<>();
         this.transitions = new ArrayList<>();
         this.acceptStates = new HashSet<>();
+    }
+// Запис във файла
+    public void saveFile(String filename){
+        try(ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))){
+            out.writeObject(this);
+            System.out.println("Автоматът е записан в "+ filename);
+        }catch (IOException е ){
+            System.out.println("Грешка при записването");
+        }
+    }
+// Четене от файла
+    public static NFA loadFilr(String filename){
+        try(ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))){
+            return (NFA) in.readObject();
+        }catch (IOException | ClassNotFoundException e){
+            System.out.println("Грешка при зарежадането");
+            return null;
+        }
+    }
+
+
+    public int getId(){
+        return id;
     }
 
     public void addState(String state) {
@@ -45,7 +75,7 @@ public class NFA {
         alphabet.add(symbol); // Добавяме символа в азбуката (ако още не е добавен)
     }
 
-    // Извежда преходи в автомата
+    // Извежда всички преходи в автомата
     public void printTransitions() {
         System.out.println("Преходи в автомата:");
         for (Transition t : transitions) {
@@ -53,12 +83,14 @@ public class NFA {
         }
     }
 
-   /Извеждане на информация за автомата
+    // Метод за извеждане на информация за автомата
     @Override
     public String toString() {
         return "Състояния: " + states + "\n" +
+                "NFA ID: " + id + "\n"+
                 "Азбука: " + alphabet + "\n" +
                 "Начално състояние: " + startState + "\n" +
                 "Крайни състояния: " + acceptStates;
     }
 }
+
