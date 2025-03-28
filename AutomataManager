@@ -1,0 +1,117 @@
+import java.util.*;
+
+public classimport java.util.*;
+
+public class AutomataManager {
+    private Map<Integer, NFA> automata;
+    private int nextId = 1;
+
+    public AutomataManager() {
+        this.automata = new HashMap<>();
+    }
+
+    public void addAutomaton(NFA nfa) {
+        automata.put(nextId, nfa);
+        System.out.println("Добавен е автомат с ID: " + nextId);
+        nextId++;
+    }
+
+    public void listAutomata() {
+        System.out.println("Списък с идентификаторите на автоматите:");
+        for (Integer id : automata.keySet()) {
+            System.out.println("NFA ID: " + id);
+        }
+    }
+
+    public void printAutomaton(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            System.out.println("Автомат с ID " + id + ":");
+            System.out.println(nfa);
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+
+    public void checkDeterministic(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            if (nfa.isDeterministic()) {
+                System.out.println("Автоматът с ID " + id + " е детерминиран (DFA).");
+            } else {
+                System.out.println("Автоматът с ID " + id + " е недетерминиран (NFA).");
+            }
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+
+    public void checkEmpty(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            if (nfa.isLanguageEmpty()) {
+                System.out.println("Езикът на автомата с ID " + id + " е празен.");
+            } else {
+                System.out.println("Езикът на автомата с ID " + id + " НЕ е празен.");
+            }
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+} {
+    private Map<Integer, NFA> automata;
+    private int nextId = 1;
+
+    public AutomataManager() {
+        this.automata = new HashMap<>();
+    }
+
+    public void addAutomaton(NFA nfa) {
+        automata.put(nextId, nfa);
+        System.out.println("Добавен е автомат с ID: " + nextId);
+        nextId++;
+    }
+
+    public void listAutomata() {
+        System.out.println("Списък с идентификаторите на автоматите:");
+        for (Integer id : automata.keySet()) {
+            System.out.println("NFA ID: " + id);
+        }
+    }
+
+    public void printAutomaton(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            System.out.println("Автомат с ID " + id + ":");
+            System.out.println(nfa);
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+
+    public void checkDeterministic(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            if (nfa.isDeterministic()) {
+                System.out.println("Автоматът с ID " + id + " е детерминиран (DFA).");
+            } else {
+                System.out.println("Автоматът с ID " + id + " е недетерминиран (NFA).");
+            }
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+
+    public void checkEmpty(int id) {
+        NFA nfa = automata.get(id);
+        if (nfa != null) {
+            if (nfa.isLanguageEmpty()) {
+                System.out.println("Езикът на автомата с ID " + id + " е празен.");
+            } else {
+                System.out.println("Езикът на автомата с ID " + id + " НЕ е празен.");
+            }
+        } else {
+            System.out.println("Автомат с ID " + id + " не е намерен.");
+        }
+    }
+}
