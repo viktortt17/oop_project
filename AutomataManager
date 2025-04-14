@@ -1,7 +1,5 @@
 import java.util.*;
 
-public classimport java.util.*;
-
 public class AutomataManager {
     private Map<Integer, NFA> automata;
     private int nextId = 1;
@@ -58,60 +56,86 @@ public class AutomataManager {
             System.out.println("Автомат с ID " + id + " не е намерен.");
         }
     }
-} {
-    private Map<Integer, NFA> automata;
-    private int nextId = 1;
 
-    public AutomataManager() {
-        this.automata = new HashMap<>();
-    }
-
-    public void addAutomaton(NFA nfa) {
-        automata.put(nextId, nfa);
-        System.out.println("Добавен е автомат с ID: " + nextId);
-        nextId++;
-    }
-
-    public void listAutomata() {
-        System.out.println("Списък с идентификаторите на автоматите:");
-        for (Integer id : automata.keySet()) {
-            System.out.println("NFA ID: " + id);
-        }
-    }
-
-    public void printAutomaton(int id) {
+    public void recognizeWord(int id, String word) {
         NFA nfa = automata.get(id);
-        if (nfa != null) {
-            System.out.println("Автомат с ID " + id + ":");
-            System.out.println(nfa);
-        } else {
+        if (nfa == null) {
             System.out.println("Автомат с ID " + id + " не е намерен.");
+            return;
+        }
+
+        if (accepts(nfa, nfa.getStartState(), word, new HashSet<>())) {
+            System.out.println("Думата \"" + word + "\" се разпознава от автомата.");
+        } else {
+            System.out.println("Думата \"" + word + "\" НЕ се разпознава от автомата.");
         }
     }
 
-    public void checkDeterministic(int id) {
-        NFA nfa = automata.get(id);
-        if (nfa != null) {
-            if (nfa.isDeterministic()) {
-                System.out.println("Автоматът с ID " + id + " е детерминиран (DFA).");
-            } else {
-                System.out.println("Автоматът с ID " + id + " е недетерминиран (NFA).");
+    private boolean accepts(NFA nfa, String currentState, String word, Set<String> visited) {
+        String key = currentState + "|" + word;
+        if (visited.contains(key)) return false;
+        visited.add(key);
+
+        if (word.isEmpty() && nfa.getAcceptStates().contains(currentState)) {
+            return true;
+        }
+
+        for (Transition t : nfa.getTransitions()) {
+            if (t.getFromState().equals(currentState)) {
+                if (t.getSymbol().equals("ε")) {
+                    if (accepts(nfa, t.getToState(), word, visited)) {
+                        return true;
+                    }
+                } else if (!word.isEmpty() && t.getSymbol().equals(String.valueOf(word.charAt(0)))) {
+                    if (accepts(nfa, t.getToState(), word.substring(1), visited)) {
+                        return true;
+                    }
+                }
             }
-        } else {
-            System.out.println("Автомат с ID " + id + " не е намерен.");
         }
+
+        return false;
     }
 
-    public void checkEmpty(int id) {
-        NFA nfa = automata.get(id);
-        if (nfa != null) {
-            if (nfa.isLanguageEmpty()) {
-                System.out.println("Езикът на автомата с ID " + id + " е празен.");
-            } else {
-                System.out.println("Езикът на автомата с ID " + id + " НЕ е празен.");
-            }
-        } else {
-            System.out.println("Автомат с ID " + id + " не е намерен.");
+    public void unionAutomata(int id1, int id2) {
+        NFA a1 = automata.get(id1);
+        NFA a2 = automata.get(id2);
+
+        if (a1 == null || a2 == null) {
+            System.out.println("Един от автоматите не е намерен.");
+            return;
         }
+
+        Set<String> newStates = new HashSet<>();
+        Set<String> newAlphabet = new HashSet<>();
+        Set<Transition> newTransitions = new HashSet<>();
+        Set<String> newAcceptStates = new HashSet<>();
+
+        String prefix1 = "A1_";
+        String prefix2 = "A2_";
+
+        for (String s : a1.getStates()) newStates.add(prefix1 + s);
+        for (String s : a2.getStates()) newStates.add(prefix2 + s);
+
+        newAlphabet.addAll(a1.getAlphabet());
+        newAlphabet.addAll(a2.getAlphabet());
+
+        for (Transition t : a1.getTransitions()) {
+            newTransitions.add(new Transition(prefix1 + t.getFromState(), prefix1 + t.getToState(), t.getSymbol()));
+        }
+        for (Transition t : a2.getTransitions()) {
+            newTransitions.add(new Transition(prefix2 + t.getFromState(), prefix2 + t.getToState(), t.getSymbol()));
+        }
+
+        String newStartState = "S_union_" + id1 + "_" + id2;
+        newStates.add(newStartState);
+        newTransitions.add(new Transition(newStartState, prefix1 + a1.getStartState(), "ε"));
+        newTransitions.add(new Transition(newStartState, prefix2 + a2.getStartState(), "ε"));
+
+        for (String s : a1.getAcceptStates()) newAcceptStates.add(prefix1 + s);
+        for (String s : a2.getAcceptStates()) newAcceptStates.add(prefix2 + s);
+
+        NFA unionNFA = new NFA(newStates, newAlphabet, newTransitions, newStartState, newAcceptStates);
+        addAutomaton(unionNFA);
     }
 }
