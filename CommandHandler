@@ -1,0 +1,81 @@
+import java.io.*;
+import java.util.Map;
+import java.util.Scanner;
+
+public class CommandHandler {
+
+    private Map<Integer, NFA> automataMap;
+    private String currentFilename = null;
+    private boolean isModified = false;
+
+    public CommandHandler(Map<Integer, NFA> automataMap) {
+        this.automataMap = automataMap;
+    }
+
+    public void open(String filename) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+            Map<Integer, NFA> loaded = (Map<Integer, NFA>) in.readObject();
+            automataMap.clear();
+            automataMap.putAll(loaded);
+            currentFilename = filename;
+            isModified = false;
+            System.out.println("Файлът е зареден успешно.");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Грешка при зареждане на файл: " + e.getMessage());
+        }
+    }
+
+    public void save() {
+        if (currentFilename == null) {
+            System.out.println("Няма избран файл. Използвайте 'save as <име>'");
+            return;
+        }
+        saveAs(currentFilename);
+    }
+
+    public void saveAs(String filename) {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+            out.writeObject(automataMap);
+            currentFilename = filename;
+            isModified = false;
+            System.out.println("Успешно записване във файла: " + filename);
+        } catch (IOException e) {
+            System.out.println("Грешка при запис: " + e.getMessage());
+        }
+    }
+
+    public void help() {
+        System.out.println("Списък с налични команди:");
+        System.out.println("open <filename>       - Отваря файл със сериализирани автомати");
+        System.out.println("save                  - Записва текущите автомати във вече отворения файл");
+        System.out.println("save as <filename>    - Записва текущите автомати във нов файл");
+        System.out.println("exit                  - Излиза от програмата (ще ви попита дали да запишете)");
+        System.out.println("help                  - Показва този списък с команди");
+        System.out.println("add <описание>        - Добавя нов автомат от текстов вход");
+        System.out.println("remove <id>           - Премахва автомат по ID");
+        System.out.println("list                  - Извежда списък с ID-та на автоматите");
+        System.out.println("print <id>            - Извежда информация за автомат с дадено ID");
+        System.out.println("recognize <id> <word> - Проверява дали автоматът разпознава дума");
+        System.out.println("isdeterministic <id>  - Проверява дали автоматът е детерминиран");
+        System.out.println("isempty <id>          - Проверява дали езикът на автомата е празен");
+        System.out.println("union <id1> <id2>     - Обединява два автомата и създава нов");
+    }
+
+
+    public void exit(Scanner scanner) {
+        if (isModified) {
+            System.out.print("Имате незаписани промени. Искате ли да запишете? (yes/no): ");
+            String answer = scanner.nextLine().trim().toLowerCase();
+            if (answer.equals("yes") || answer.equals("y")) {
+                save();
+            }
+        }
+        System.out.println("Изход от програмата...");
+        System.exit(0);
+    }
+
+    public void setModified(boolean modified) {
+        this.isModified = modified;
+    }
+}
+
