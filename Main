@@ -1,0 +1,103 @@
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        AutomataManager manager = new AutomataManager();
+        CommandHandler handler = new CommandHandler(manager.getAutomataMap());
+
+        System.out.println("Добре дошъл в NFA Manager!");
+        System.out.println("Въведи команда. Напиши 'help' за списък с команди.");
+
+        while (true) {
+            System.out.print("> ");
+            String command = scanner.nextLine().trim();
+
+            if (command.equals("help")) {
+                handler.help();
+            } else if (command.equals("exit")) {
+                handler.exit(scanner);
+                break;
+            } else if (command.startsWith("open ")) {
+                String filename = command.substring(5).trim();
+                handler.open(filename);
+            } else if (command.equals("save")) {
+                handler.save();
+            } else if (command.startsWith("save as ")) {
+                String filename = command.substring(8).trim();
+                handler.saveAs(filename);
+            } else if (command.equals("list")) {
+                manager.listAutomata();
+            } else if (command.startsWith("print ")) {
+                try {
+                    int id = Integer.parseInt(command.substring(6).trim());
+                    manager.printAutomaton(id);
+                } catch (NumberFormatException e) {
+                    System.out.println("Невалиден ID.");
+                }
+            } else if (command.startsWith("recognize ")) {
+                String[] parts = command.substring(10).trim().split(" ");
+                if (parts.length == 2) {
+                    try {
+                        int id = Integer.parseInt(parts[0]);
+                        String word = parts[1];
+                        manager.recognizeWord(id, word);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Невалиден ID.");
+                    }
+                } else {
+                    System.out.println("Формат: recognize <id> <word>");
+                }
+            } else if (command.startsWith("add")) {
+            manager.createAutomatonFromInput(scanner);
+            handler.setModified(true);
+        }
+
+        else if (command.startsWith("isdeterministic ")) {
+                try {
+                    int id = Integer.parseInt(command.substring(16).trim());
+                    manager.checkDeterministic(id);  // <-- ТУК е оправен методът
+                } catch (NumberFormatException e) {
+                    System.out.println("Невалиден ID.");
+                }
+            } else if (command.startsWith("isempty ")) {
+                try {
+                    int id = Integer.parseInt(command.substring(8).trim());
+                    manager.checkEmpty(id);  // <-- Също е правилен метод
+                } catch (NumberFormatException e) {
+                    System.out.println("Невалиден ID.");
+                }
+            } else if (command.startsWith("add ")) {
+                System.out.println("Тук трябва да се имплементира логиката за добавяне на нов автомат.");
+                handler.setModified(true);
+            } else if (command.startsWith("remove ")) {
+                try {
+                    int id = Integer.parseInt(command.substring(7).trim());
+                    manager.removeAutomaton(id);
+                    handler.setModified(true);
+                } catch (NumberFormatException e) {
+                    System.out.println("Невалиден ID.");
+                }
+            } else if (command.startsWith("union ")) {
+                String[] parts = command.substring(6).trim().split(" ");
+                if (parts.length == 2) {
+                    try {
+                        int id1 = Integer.parseInt(parts[0]);
+                        int id2 = Integer.parseInt(parts[1]);
+                        manager.unionAutomata(id1, id2);
+                        handler.setModified(true);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Невалидни ID-та.");
+                    }
+
+                } else {
+                    System.out.println("Формат: union <id1> <id2>");
+                }
+            } else {
+                System.out.println("Невалидна команда. Напиши 'help' за помощ.");
+            }
+        }
+
+        scanner.close();
+    }
+}
