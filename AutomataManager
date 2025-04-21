@@ -8,6 +8,7 @@ public class AutomataManager {
         this.automata = new HashMap<>();
     }
 
+    private int nextID = 1;
     public void addAutomaton(NFA nfa) {
         automata.put(nextId, nfa);
         System.out.println("Добавен е автомат с ID: " + nextId);
@@ -137,5 +138,51 @@ public class AutomataManager {
 
         NFA unionNFA = new NFA(newStates, newAlphabet, newTransitions, newStartState, newAcceptStates);
         addAutomaton(unionNFA);
+    }
+    public void createAutomatonFromInput(Scanner scanner) {
+        System.out.print("Въведи състояния (разделени със запетая): ");
+        Set<String> states = new HashSet<>(Arrays.asList(scanner.nextLine().trim().split(",")));
+
+        System.out.print("Въведи азбука (разделени със запетая): ");
+        Set<String> alphabet = new HashSet<>(Arrays.asList(scanner.nextLine().trim().split(",")));
+
+        System.out.print("Въведи начално състояние: ");
+        String startState = scanner.nextLine().trim();
+
+        System.out.print("Въведи финални състояния (разделени със запетая): ");
+        Set<String> acceptStates = new HashSet<>(Arrays.asList(scanner.nextLine().trim().split(",")));
+
+        Set<Transition> transitions = new HashSet<>();
+        System.out.println("Въвеждай преходи във формат 'от,символ,до'. Напиши 'done' за край.");
+        while (true) {
+            System.out.print("Преход: ");
+            String line = scanner.nextLine().trim();
+            if (line.equalsIgnoreCase("done")) break;
+            String[] parts = line.split(",");
+            if (parts.length == 3) {
+                transitions.add(new Transition(parts[0].trim(), parts[2].trim(), parts[1].trim()));
+            } else {
+                System.out.println("Невалиден формат. Пример: q0,a,q1");
+            }
+        }
+
+        NFA nfa = new NFA(states, alphabet, transitions, startState, acceptStates);
+        addAutomaton(nfa);
+    }
+
+
+    public void removeAutomaton(int id) {
+        if (automata.containsKey(id)) {
+            automata.remove(id);
+            System.out.println("Автомат с ID " + id + " беше премахнат.");
+        } else {
+            System.out.println("Автомат с ID " + id + " не съществува.");
+        }
+    }
+
+
+
+    public Map<Integer, NFA> getAutomataMap() {
+        return automata;
     }
 }
