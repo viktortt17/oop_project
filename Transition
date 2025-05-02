@@ -1,7 +1,7 @@
 import java.io.Serializable;
-import java.util.*;
+import java.util.Objects;
 
-class Transition implements Serializable {
+public class Transition implements Serializable {
     private String fromState;
     private String toState;
     private String symbol;
@@ -27,5 +27,20 @@ class Transition implements Serializable {
     @Override
     public String toString() {
         return fromState + " --(" + symbol + ")--> " + toState;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Transition)) return false;
+        Transition that = (Transition) o;
+        return Objects.equals(fromState, that.fromState) &&
+                Objects.equals(toState, that.toState) &&
+                Objects.equals(symbol, that.symbol);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromState, toState, symbol);
     }
 }
