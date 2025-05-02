@@ -48,12 +48,47 @@ public class Main {
                 } else {
                     System.out.println("Формат: recognize <id> <word>");
                 }
-            } else if (command.startsWith("add")) {
+            } else if (command.equals("add")) {
             manager.createAutomatonFromInput(scanner);
             handler.setModified(true);
         }
 
-        else if (command.startsWith("isdeterministic ")) {
+            else if (command.startsWith("un ")) {
+                String[] parts = command.split(" ");
+                if (parts.length < 2) {
+                    System.out.println("Формат: un <id>");
+                    continue;
+                }
+
+                try {
+                    int id = Integer.parseInt(parts[1]);
+
+                    if (!manager.getAutomataMap().containsKey(id)) {
+                        System.out.println("Автомат с ID " + id + " не съществува.");
+                        continue;
+                    }
+
+                    NFA original = manager.getAutomataMap().get(id);
+                    NFA positiveWrapped = NFA.positiveClosure(original);
+
+                    // Генерираме нов ID (най-малкото свободно число)
+                    int newId = 0;
+                    while (manager.getAutomataMap().containsKey(newId)) {
+                        newId++;
+                    }
+
+                    manager.getAutomataMap().put(newId, positiveWrapped);
+                    handler.setModified(true);
+
+                    System.out.println("Позитивната обвивка е създадена. Нов ID: " + newId);
+                } catch (NumberFormatException e) {
+                    System.out.println("Невалиден ID. Трябва да е цяло число.");
+                }
+            }
+
+
+
+            else if (command.startsWith("isdeterministic ")) {
                 try {
                     int id = Integer.parseInt(command.substring(16).trim());
                     manager.checkDeterministic(id);  // <-- ТУК е оправен методът
@@ -67,9 +102,6 @@ public class Main {
                 } catch (NumberFormatException e) {
                     System.out.println("Невалиден ID.");
                 }
-            } else if (command.startsWith("add ")) {
-                System.out.println("Тук трябва да се имплементира логиката за добавяне на нов автомат.");
-                handler.setModified(true);
             } else if (command.startsWith("remove ")) {
                 try {
                     int id = Integer.parseInt(command.substring(7).trim());
@@ -78,6 +110,7 @@ public class Main {
                 } catch (NumberFormatException e) {
                     System.out.println("Невалиден ID.");
                 }
+
             } else if (command.startsWith("union ")) {
                 String[] parts = command.substring(6).trim().split(" ");
                 if (parts.length == 2) {
