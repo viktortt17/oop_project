@@ -59,6 +59,7 @@ public class CommandHandler {
         System.out.println("isdeterministic <id>  - Проверява дали автоматът е детерминиран");
         System.out.println("isempty <id>          - Проверява дали езикът на автомата е празен");
         System.out.println("union <id1> <id2>     - Обединява два автомата и създава нов");
+        System.out.println("un <id>               - Създава позитивна обвивка (positive closure) на автомат");
     }
 
 
