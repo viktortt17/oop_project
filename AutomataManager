@@ -8,7 +8,6 @@ public class AutomataManager {
         this.automata = new HashMap<>();
     }
 
-    private int nextID = 1;
     public void addAutomaton(NFA nfa) {
         automata.put(nextId, nfa);
         System.out.println("Добавен е автомат с ID: " + nextId);
