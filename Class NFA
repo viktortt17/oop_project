@@ -82,14 +82,60 @@ public class NFA implements Serializable {
         return true;
     }
 
+    public static NFA positiveClosure(NFA original) {
+        // Копираме съществуващите компоненти
+        Set<String> newStates = new HashSet<>(original.getStates());
+        Set<String> newAlphabet = new HashSet<>(original.getAlphabet());
+        Set<Transition> newTransitions = new HashSet<>(original.getTransitions());
+        String newStartState = original.getStartState();
+        Set<String> newAcceptStates = new HashSet<>(original.getAcceptStates());
+
+        // Премахваме финалните състояния, които са достижими чрез ε-пътека от началното
+        Set<String> cleanedAcceptStates = new HashSet<>(newAcceptStates);
+        for (String state : newAcceptStates) {
+            if (original.isEpsilonReachable(newStartState, state)) {
+                cleanedAcceptStates.remove(state);
+            }
+        }
+
+        return new NFA(newStates, newAlphabet, newTransitions, newStartState, cleanedAcceptStates);
+    }
+
+
+    private boolean isEpsilonReachable(String from, String to) {
+        Set<String> visited = new HashSet<>();
+        Deque<String> stack = new ArrayDeque<>();
+        stack.push(from);
+
+        while (!stack.isEmpty()) {
+            String current = stack.pop();
+            if (current.equals(to)) return true;
+            if (visited.contains(current)) continue;
+            visited.add(current);
+
+            for (Transition t : transitions) {
+                if (t.getFromState().equals(current) && t.getSymbol().equals("ε")) {
+                    stack.push(t.getToState());
+                }
+            }
+        }
+        return false;
+    }
+
+
+
     @Override
     public String toString() {
-        return "NFA{" +
-                "states=" + states +
-                ", alphabet=" + alphabet +
-                ", transitions=" + transitions +
-                ", startState='" + startState + '\'' +
-                ", acceptStates=" + acceptStates +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("Състояния: ").append(states).append("\n");
+        sb.append("Азбука: ").append(alphabet).append("\n");
+        sb.append("Начално състояние: ").append(startState).append("\n");
+        sb.append("Финални състояния: ").append(acceptStates).append("\n");
+        sb.append("Преходи:\n");
+        for (Transition t : transitions) {
+            sb.append("  ").append(t.getFromState()).append(" --").append(t.getSymbol()).append("--> ").append(t.getToState()).append("\n");
+        }
+        return sb.toString();
     }
+
 }
