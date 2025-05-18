@@ -71,7 +71,6 @@ public class Main {
                     NFA original = manager.getAutomataMap().get(id);
                     NFA positiveWrapped = NFA.positiveClosure(original);
 
-                    // Генерираме нов ID (най-малкото свободно число)
                     int newId = 0;
                     while (manager.getAutomataMap().containsKey(newId)) {
                         newId++;
@@ -91,14 +90,14 @@ public class Main {
             else if (command.startsWith("isdeterministic ")) {
                 try {
                     int id = Integer.parseInt(command.substring(16).trim());
-                    manager.checkDeterministic(id);  // <-- ТУК е оправен методът
+                    manager.checkDeterministic(id);
                 } catch (NumberFormatException e) {
                     System.out.println("Невалиден ID.");
                 }
             } else if (command.startsWith("isempty ")) {
                 try {
                     int id = Integer.parseInt(command.substring(8).trim());
-                    manager.checkEmpty(id);  // <-- Също е правилен метод
+                    manager.checkEmpty(id);
                 } catch (NumberFormatException e) {
                     System.out.println("Невалиден ID.");
                 }
