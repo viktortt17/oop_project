@@ -83,14 +83,13 @@ public class NFA implements Serializable {
     }
 
     public static NFA positiveClosure(NFA original) {
-        // Копираме съществуващите компоненти
         Set<String> newStates = new HashSet<>(original.getStates());
         Set<String> newAlphabet = new HashSet<>(original.getAlphabet());
         Set<Transition> newTransitions = new HashSet<>(original.getTransitions());
         String newStartState = original.getStartState();
         Set<String> newAcceptStates = new HashSet<>(original.getAcceptStates());
 
-        // Премахваме финалните състояния, които са достижими чрез ε-пътека от началното
+
         Set<String> cleanedAcceptStates = new HashSet<>(newAcceptStates);
         for (String state : newAcceptStates) {
             if (original.isEpsilonReachable(newStartState, state)) {
